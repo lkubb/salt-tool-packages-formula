@@ -1,0 +1,42 @@
+tool:
+  pkgs:
+    update_auto: True           # keep the packages updated to their latest version on subsequent
+                                # runs (system packages on MacOS are kept up to date by brew anyways)
+    defaults:                   # default formula configuration for all users
+      pkgs:                     # package manager packages
+        wanted:                 # Those will be installed with the system's default package manager.
+          - coreutils           # Since they will be installed globally, all packages for all users
+          - gawk                # will be accumulated.
+        required:               # Those -> states <- will be required before installing.
+          - tool-git
+      pipx:                     # Install python applications/libs with a cli interface globally inside
+        wanted:                 # their dedicated venv, without depending on the default python version.
+          - poetry
+      mas:                      # Mac App Store apps are best specified by ID.
+        wanted:
+          - 747648890
+         #- Telegram
+      crates:                   # Install crates with cargo. Make sure you add the installation path to $path.
+        wanted:                 # By default, they will be installed in CARGO_INSTALL_ROOT/bin > CARGO_HOME/bin.
+          - flavours
+      asdf:                     # asdf is a version manager, so here it is easy to specify package version.
+        wanted:
+          - direnv              # Without version, latest will be installed by default.
+          - golang: latest      # You can specify latest explicitly,
+          - python: '3.10.1'    # as well as a specific version.
+          - ruby                # Most script language packages depend on the version, so they are best installed
+                                # by the asdf plugin via a default-* file (eg default-gems) that you can sync
+                                # via your dotfiles. (ruby/nodejs/pips) pipx is an exception since it isolates
+                                # the application's environment inside a venv
+
+  users:
+    user:
+      pkgs:
+        pkgs:                   # System package manager packages.
+          wanted:               # The system's default package manager installs packages globally, therefore
+            - dnsutil           # they will be accumulated for all users. Stick to defaults to keep it simple
+        pipx:
+          wanted:
+            - cowsay
+          required:             # Required works for every package manager.
+            - dotsync

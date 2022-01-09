@@ -1,0 +1,101 @@
+{#- get dict of user configurations -#}
+{%- set pkgs = salt['pillar.get']('tool:pkgs', {'users': {}}, merge=True) -%}
+{%- set users = {} -%}
+
+{#- rejectattr filter does not fit with mapping. need to filter out users before merging default values -#}
+{%- for tool_user, tool_user_conf in salt['pillar.get']('tool:users', {}).items() -%}
+{#- by default, install tool if it was targeted. explicitly deny for a specific user to override -#}
+  {%- if tool_user_conf.get('pkgs', True) -%}
+    {%- do users.update({tool_user: tool_user_conf}) -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- set managers = ['asdf', 'crates', 'mas', 'pipx'] %}
+{%- set versioned_managers = ['asdf', 'crates'] %}
+{%- set versioned_managers_multi = ['asdf'] %}
+{%- set asdf_plugins = [] %}
+
+{%- do salt['defaults.merge'](users, pkgs.get('users', {}), merge_lists=True) -%} {#- merge, not replace pkgs -#}
+
+{#- update all user configuration for pkgs with its defaults -#}
+{%- do salt['defaults.update'](users, {'pkgs': pkgs.get('defaults', {})}) -%}
+
+{%- set system_pkgs = {'wanted': [], 'req_states': [], 'req_pkgs': []} %}
+
+{#- concatenate all requisites for all users per package manager (except system package manager) -#}
+{%- for mgr in managers %}
+  {#- only for package managers that are actually used by any user -#}
+  {%- if users.values() | selectattr('pkgs.' ~ mgr, 'defined') | list %}
+    {%- set parsed_req = {'pkgs': [], 'states': []} %}
+    {%- for req in users.values() | selectattr('pkgs.' ~ mgr ~ '.required', 'defined') | map(attribute='pkgs.' ~ mgr ~ '.required') %}
+      {%- do parsed_req.pkgs.extend(req.get('pkgs', [])) %}
+      {%- do parsed_req.states.extend(req.get('states', [])) %}
+    {%- endfor %}
+    {%- do pkgs.update({'_' ~ mgr : {'required': {'pkgs': parsed_req.pkgs | unique, 'states': parsed_req.states | unique}}}) %}
+  {%- endif %}
+{%- endfor %}
+
+{#- embed user information that will be reused (home, primary group, shell, paths), concat system pkgs -#}
+{%- for user in users.keys() -%}
+  {%- do users[user].update({'_pkgs': {}}) -%}
+  {%- do users[user].update({'name': user}) -%}
+  {%- set user_info = salt['user.info'](user) -%}
+  {%- load_yaml as user_info -%}
+group: {{ salt['user.primary_group'](user) }}
+home: {{ user_info.home }}
+shell: {{ user_info.shell.split('/')[-1] }}
+  {%- endload -%}
+  {%- do users[user].update(salt['defaults.merge'](user_info, users[user], in_place=False)) -%}
+
+  {%- if users[user].pkgs.pkgs is defined %}
+    {#- aggregate all packages since they are installed globally, not per user -#}
+    {%- do system_pkgs['wanted'].extend(users[user] | traverse('pkgs:pkgs:wanted:', [])) %}
+    {%- do system_pkgs['req_pkgs'].extend(users[user] | traverse('pkgs:pkgs:required:pkgs', [])) %}
+    {%- do system_pkgs['req_states'].extend(users[user] | traverse('pkgs:pkgs:required:states', [])) %}
+  {%- endif %}
+  {#- normalize versioned packages to provide syntactic sugar in definitions -#}
+  {%- for mgr in versioned_managers -%}
+    {%- if users[user].pkgs[mgr] is defined %}
+      {%- set parsed = {} %}
+      {%- for versioned in users[user].pkgs[mgr].get('wanted', []) %}
+        {#- 2(3) possibilities: - python / - python: 'latest' (/ - python: ['3.10', '3.8']) -#}
+        {%- if versioned is string %}
+          {%- do parsed.update({versioned: ['latest']}) %}
+        {%- elif versioned is mapping %}
+          {%- set k = versioned.keys() | first %}
+          {%- set v = versioned.values() | first %}
+          {%- if v is string %}
+            {%- do parsed.update({k: [v]}) %}
+          {%- elif mgr in versioned_managers_multi and v | is_list %}
+            {#- if package manager supports installing multiple versions of the same package, allow lists -#}
+            {%- do parsed.update({k: v}) %}
+          {%- else %}
+            {%- do salt['log.error']("Something is wrong in your definitions for " ~ mgr ~ ". Please check your pillar.") %}
+          {%- endif %}
+        {%- else %}
+          {%- do salt['log.error']("Something is wrong in your definitions for " ~ mgr ~ ". Please check your pillar.") %}
+        {%- endif %}
+      {%- endfor %}
+      {%- do users[user].pkgs[mgr].update({'_wanted': parsed}) %}
+    {%- endif %}
+  {%- endfor %}
+  {%- if users[user].pkgs | traverse('asdf:_wanted', False) %}
+    {#- asdf plugins sometimes need dependencies. for plugins that are defined inside tool-asdf,
+        require their states as well to make sure deps are installed @TODO global -#}
+    {%- for plugin in users[user].pkgs.asdf._wanted.keys() %}
+      {%- if salt['cp.list_master'](prefix='tool-asdf/' ~ plugin ~ '/init') -%}
+        {%- do pkgs | append_dict_key_value('_asdf:required:states', 'tool-asdf.' ~ plugin) %}
+      {%- endif %}
+    {%- endfor %}
+  {%- endif %}
+{%- endfor -%}
+
+{%- do pkgs.update({'_system_pkgs': {
+    'wanted': system_pkgs['wanted'] | unique | list,
+    'req_pkgs': system_pkgs['req_pkgs'] | unique | list,
+    'req_states': system_pkgs['req_states'] | unique | list}}) %}
+
+{%- do pkgs | append_dict_key_value('_asdf:plugins', asdf_plugins | unique | list) %}
+{%- do pkgs.update({'users': users.values() | list}) -%}
+
+{{ pkgs | json }}
