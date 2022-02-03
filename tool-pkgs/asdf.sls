@@ -11,7 +11,7 @@ include:
   - tool-asdf
 {%- if req_states -%}
   {%- for state in req_states %}
-  - {{ state}}
+  - {{ state }}
   {%- endfor %}
 {%- endif %}
 
