@@ -22,7 +22,7 @@ Required packages for pipx package installation are installed:
   pkg.{{ pkg_mode }}:
     - pkgs: {{ req_pkgs | json }}
     - require:
-      - sls: tool-pipx
+      - Pipx setup is completed
   {%- if req_states %}
     {%- for state in req_states %}
       - sls: {{ state }}

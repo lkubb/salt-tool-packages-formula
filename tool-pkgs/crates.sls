@@ -22,7 +22,7 @@ Required packages for crates installation are installed:
   pkg.{{ pkg_mode }}:
     - pkgs: {{ req_pkgs | json }}
     - require:
-      - sls: tool-rust
+      - Rust setup is completed #sls: tool-rust
   {%- if req_states %}
     {%- for state in req_states %}
       - sls: {{ state }}

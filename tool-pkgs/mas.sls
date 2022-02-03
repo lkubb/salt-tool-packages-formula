@@ -24,7 +24,7 @@ Required packages for Mac App Store App installation are installed:
   pkg.{{ pkg_mode }}:
     - pkgs: {{ req_pkgs | json }}
     - require:
-      - sls: tool-mas
+      - mas is installed # seems like requiring the whole sls file does not work
   {%- if req_states %}
     {%- for state in req_states %}
       - sls: {{ state }}

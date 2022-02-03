@@ -54,6 +54,9 @@ Wanted package {{ plugin }} {{ version }} is installed with asdf for user '{{ us
       {%- endif %}
       {%- if req_states %}
         {%- for state in req_states %}
+          {%- if 'asdf.' == state[:4] %}
+            {%- set state = state ~ '.package' %}
+          {%- endif %}
       - sls: {{ state }}
         {%- endfor %}
       {%- endif %}
