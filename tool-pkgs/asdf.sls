@@ -21,7 +21,7 @@ Required packages for asdf plugin/version installation are installed:
   pkg.{{ pkg_mode }}:
     - pkgs: {{ req_pkgs | json }}
     - require:
-      - sls: tool-asdf
+      - asdf setup is completed
   {%- if req_states %}
     {%- for state in req_states %}
       - sls: {{ state }}
@@ -48,15 +48,12 @@ Wanted package {{ plugin }} {{ version }} is installed with asdf for user '{{ us
     - version: {{ version }}
     - user: {{ user.name }}
     - require:
-      - sls: tool-asdf
+      - asdf setup is completed
       {%- if req_pkgs %}
       - Required packages for asdf plugin/version installation are installed
       {%- endif %}
       {%- if req_states %}
         {%- for state in req_states %}
-          {%- if 'asdf.' == state[:5] %}
-            {%- set state = state ~ '.package' %}
-          {%- endif %}
       - sls: {{ state }}
         {%- endfor %}
       {%- endif %}

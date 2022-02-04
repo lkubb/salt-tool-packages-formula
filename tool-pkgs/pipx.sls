@@ -40,7 +40,7 @@ Wanted pipx package '{{ package }}' is installed for user '{{ user.name }}':
     - name: {{ package }}
     - user: {{ user.name }}
     - require:
-      - sls: tool-pipx
+      - Pipx setup is completed
     {%- if req_pkgs %}
       - Required packages for pipx package installation are installed
     {%- endif %}

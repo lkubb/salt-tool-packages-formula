@@ -22,7 +22,7 @@ Required packages for crates installation are installed:
   pkg.{{ pkg_mode }}:
     - pkgs: {{ req_pkgs | json }}
     - require:
-      - Rust setup is completed #sls: tool-rust
+      - Rust setup is completed
   {%- if req_states %}
     {%- for state in req_states %}
       - sls: {{ state }}
@@ -40,7 +40,7 @@ Wanted crate '{{ crate }}' is installed for user '{{ user.name }}':
     - version: {{ version | first }}
     - user: {{ user.name }}
     - require:
-      - sls: tool-rust
+      - Rust setup is completed
     {%- if req_pkgs %}
       - Required packages for crates installation are installed
     {%- endif %}

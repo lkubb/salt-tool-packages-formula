@@ -49,7 +49,7 @@ shell: {{ user_info.shell.split('/')[-1] }}
 
   {%- if users[user].pkgs.pkgs is defined %}
     {#- aggregate all packages since they are installed globally, not per user -#}
-    {%- do system_pkgs['wanted'].extend(users[user] | traverse('pkgs:pkgs:wanted:', [])) %}
+    {%- do system_pkgs['wanted'].extend(users[user] | traverse('pkgs:pkgs:wanted', [])) %}
     {%- do system_pkgs['req_pkgs'].extend(users[user] | traverse('pkgs:pkgs:required:pkgs', [])) %}
     {%- do system_pkgs['req_states'].extend(users[user] | traverse('pkgs:pkgs:required:states', [])) %}
   {%- endif %}
@@ -83,8 +83,8 @@ shell: {{ user_info.shell.split('/')[-1] }}
     {#- asdf plugins sometimes need dependencies. for plugins that are defined inside tool-asdf,
         require their states as well to make sure deps are installed @TODO global -#}
     {%- for plugin in users[user].pkgs.asdf._wanted.keys() %}
-      {%- if salt['cp.list_master'](prefix='tool-asdf/' ~ plugin ~ '/init') -%}
-        {%- do pkgs | append_dict_key_value('_asdf:required:states', 'tool-asdf.' ~ plugin) %}
+      {%- if salt['cp.list_master'](prefix='tool-asdf/' ~ plugin ~ '/deps') -%}
+        {%- do pkgs | append_dict_key_value('_asdf:required:states', 'tool-asdf.' ~ plugin ~ '.deps') %}
       {%- endif %}
     {%- endfor %}
   {%- endif %}
