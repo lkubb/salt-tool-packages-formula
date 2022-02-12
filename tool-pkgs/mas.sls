@@ -39,7 +39,7 @@ Required packages for Mac App Store App installation are installed:
 
 Wanted Mac App Store app '{{ app }}' is installed for user '{{ user.name }}':
   mas.{{ mode }}:
-    - name: {{ app }}
+    - name: '{{ app }}'
     - user: {{ user.name }}
     - require:
       - sls: tool-mas.package
