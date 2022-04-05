@@ -1,42 +1,134 @@
-tool:
-  pkgs:
-    update_auto: True           # keep the packages updated to their latest version on subsequent
-                                # runs (system packages on MacOS are kept up to date by brew anyways)
-    defaults:                   # default formula configuration for all users
-      pkgs:                     # package manager packages
-        wanted:                 # Those will be installed with the system's default package manager.
-          - coreutils           # Since they will be installed globally, all packages for all users
-          - gawk                # will be accumulated.
-        required:               # Those -> states <- will be required before installing.
-          - tool-git
-      pipx:                     # Install python applications/libs with a cli interface globally inside
-        wanted:                 # their dedicated venv, without depending on the default python version.
-          - poetry
-      mas:                      # Mac App Store apps are best specified by ID.
-        wanted:
-          - 747648890
-         #- Telegram
-      crates:                   # Install crates with cargo. Make sure you add the installation path to $path.
-        wanted:                 # By default, they will be installed in CARGO_INSTALL_ROOT/bin > CARGO_HOME/bin.
-          - flavours
-      asdf:                     # asdf is a version manager, so here it is easy to specify package version.
-        wanted:
-          - direnv              # Without version, latest will be installed by default.
-          - golang: latest      # You can specify latest explicitly,
-          - python: '3.10.1'    # as well as a specific version.
-          - ruby                # Most script language packages depend on the version, so they are best installed
-                                # by the asdf plugin via a default-* file (eg default-gems) that you can sync
-                                # via your dotfiles. (ruby/nodejs/pips) pipx is an exception since it isolates
-                                # the application's environment inside a venv
+# -*- coding: utf-8 -*-
+# vim: ft=yaml
+# yamllint disable rule:comments-indentation
+---
+######################################################################
+# Mind that this is to be read as an overview of available
+# settings which can be set in many different ways, not only
+# by providing pillar values.
+# The different sources will be merged. For further information,
+# please see the docs, `libmapstack.jinja` as well as the configured
+# default sources in `parameters/map_jinja.yaml`.
+#
+# This documentation will need to be updated once there is
+# some learned experience. @TODO
+######################################################################
 
+# Apart from the various source files, there are two independent source trees
+# for user-specific configuration.
+# Generally tool_pkgs > tool_global.
+# `tool_global` focuses on specific users, of which most values
+# will be respected by all formulae in the `tool` suite:
+tool_global:
+  users:
+
+      # The following is global configuration for the user named `user`.
+    user:
+
+        # Persist environment variables used by this formula for this
+        # user to this file (will be appended to a file relative to $HOME)
+      persistenv: '.config/zsh/zshenv'
+
+        # Add runcom hooks specific to this formula to this file
+        # for this user (will be appended to a file relative to $HOME)
+      rchook: '.config/zsh/zshrc'
+
+        # This user's configuration for this formula. Will be overridden by
+        # user-specific configuration in `tool_pkgs:users`.
+        # Set this to `false` to disable configuration for this user.
+      pkgs:
+          # asdf is a version manager, so here it is easy to specify package version.
+        asdf:
+          wanted:
+              # Without version, latest will be installed by default.
+            - direnv
+              # You can specify latest explicitly,
+            - golang: latest
+              # as well as a specific version.
+            - python: 3.10.3
+              # Most script language packages depend on the version,
+              # so they are best installed by the asdf plugin via a
+              # default-* file (eg default-gems) that you can sync
+              # via your dotfiles. (ruby/nodejs/pips) pipx is an exception
+              # since it isolates the application's environment inside a venv
+            - ruby
+        crates:
+          # Install crates with cargo. Make sure you
+          # add the installation path to $path.
+          # By default, they will be installed in
+          # CARGO_INSTALL_ROOT/bin > CARGO_HOME/bin.
+          wanted:
+            - flavours
+        mas:
+          wanted:
+              # Mac App Store apps are best specified by ID.
+            - 747648890
+          # - Telegram
+          # Install python applications/libs with a cli interface globally inside
+          # their dedicated venv, without depending on the default python version.
+        pipx:
+            # Those -> states <- will be required before installing.
+            # Works for all managers.
+          required:
+            - dotsync
+          wanted:
+            - poetry
+          # package manager packages
+        pkgs:
+            # Those -> states <- will be required before installing.
+          required:
+            - tool_git
+            # Those will be installed with the system's default package manager.
+            # Since they will be installed globally, all packages for all users
+            # will be accumulated.
+          wanted:
+            - coreutils
+            - gawk
+
+tool_pkgs:
+    # keep the packages updated to their latest version on subsequent
+    # runs (system packages on MacOS are kept up to date by brew anyways)
+  update_auto: false
+
+    # Default formula configuration for all users.
+    # Packages from defaults will be merged with user-specific ones.
+  defaults:
+    pkgs: default value for all users
+
+    # User configuration can also be specified here in
+    # `tool_pkgs:users`. It will override
+    # configuration sourced from `tool_global:users`.
   users:
     user:
+      persistenv: '.bash_profile'
       pkgs:
-        pkgs:                   # System package manager packages.
-          wanted:               # The system's default package manager installs packages globally, therefore
-            - dnsutil           # they will be accumulated for all users. Stick to defaults to keep it simple
-        pipx:
-          wanted:
-            - cowsay
-          required:             # Required works for every package manager.
-            - dotsync
+        asdf: this overrides config from tool_globl:users
+
+######################################################################
+# The following settings define default values for this formula,
+# depending on different grains. You should not have to modify them
+# in most cases. For a full overview, see the different files
+# in `parameters`.
+######################################################################
+  lookup:
+    rootgroup: root
+
+######################################################################
+# This is where `tool` suite settings end and Salt behavior settings
+# inherited from `salt-formulas/template-formula` start. They will
+# influence how exactly the TOFS pattern is applied. Mind that
+# parts of this are disabled for `configsync.sls`.
+######################################################################
+  tofs:
+    # The files_switch key serves as a selector for alternative
+    # directories under the formula files directory. See TOFS pattern
+    # doc for more info.
+    # Note: Any value not evaluated by `config.get` will be used literally.
+    # This can be used to set custom paths, as many levels deep as required.
+    files_switch:
+      - any/path/can/be/used/here
+      - id
+      - roles
+      - osfinger
+      - os
+      - os_family
