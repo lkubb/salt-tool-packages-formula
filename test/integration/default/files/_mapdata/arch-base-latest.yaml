@@ -20,6 +20,17 @@ values:
         crates:
           wanted:
             - flavours
+            - rbw: 1.4.3
+            - git: https://github.com/timepigeon/explainshell-cli
+            - git:
+                branch: release-please
+                source: https://github.com/starship/starship
+            - git:
+                source: https://github.com/Peltoche/lsd
+                tag: 0.21.0
+            - git:
+                rev: 5df94b5031d5b2ec0cb13424be600f418cbc0e07
+                source: https://github.com/federico-terzi/espanso
         mas:
           wanted:
             - 747648890

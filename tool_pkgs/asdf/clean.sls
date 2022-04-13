@@ -7,8 +7,8 @@
 
 
 {%- for user in pkgs.users | selectattr('pkgs.asdf', 'defined') | selectattr('pkgs.asdf._wanted', 'defined') %}
-{%-   for plugin, versions in user.pkgs.asdf._wanted.items() %}
-{%-     for version in versions %}
+{%-   for plugin, settings in user.pkgs.asdf._wanted.items() %}
+{%-     for version in settings.versions %}
 
 Wanted package {{ plugin }} {{ version }} is removed from asdf for user '{{ user.name }}':
   asdf.version_absent:

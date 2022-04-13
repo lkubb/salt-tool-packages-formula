@@ -62,7 +62,24 @@ The following shows an example of ``tool_pkgs`` per-user configuration. If provi
         # Install crates with cargo. Make sure you add the installation path to $path.
         # By default, they will be installed in CARGO_INSTALL_ROOT/bin > CARGO_HOME/bin.
         wanted:
+              # Install the latest version from crates.io.
           - flavours
+              # Install a specific version from crates.io.
+          - rbw: 1.4.3
+              # Install from HEAD of the default branch.
+          - git: https://github.com/timepigeon/explainshell-cli
+              # Install from HEAD of a specific branch.
+          - git:
+              branch: release-please
+              source: https://github.com/starship/starship
+              # Install from a tagged commit.
+          - git:
+              source: https://github.com/Peltoche/lsd
+              tag: 0.21.0
+              # Install from a specific commit.
+          - git:
+              rev: 5df94b5031d5b2ec0cb13424be600f418cbc0e07
+              source: https://github.com/federico-terzi/espanso
       mas:
         wanted:
             # Mac App Store apps are best specified by ID.
@@ -185,6 +202,7 @@ Gives you SSH access to the instance for manual testing.
 Todo
 ----
 * make installation of specific version possible, if the underlying manager supports it
+* add ``absent`` configuration as well
 
 References
 ----------

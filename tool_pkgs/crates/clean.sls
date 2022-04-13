@@ -7,13 +7,19 @@
 
 
 {%- for user in pkgs.users | selectattr('pkgs.crates', 'defined') | selectattr('pkgs.crates._wanted', 'defined') %}
+{%-   for crate, settings in user.pkgs.crates._wanted.items() %}
+{%-     if settings.git %}
 
-{%-   for crate, version in user.pkgs.crates._wanted.items() %}
+Cannot remove crate '{{ crate }}' for user '{{ user.name }}':
+  test.show_notification:
+    - text: Currently cannot automatically remove crates installed from other sources than `crates.io`.
+
+{%-     else %}
 
 Wanted crate '{{ crate }}' is removed for user '{{ user.name }}':
   cargo.absent:
     - name: {{ crate }}
-    - version: {{ version | first }}
     - user: {{ user.name }}
+{%-     endif %}
 {%-   endfor %}
 {%- endfor %}

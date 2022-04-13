@@ -35,7 +35,7 @@ Required packages for asdf plugin/version installation are installed:
 
 
 {%- for user in pkgs.users | selectattr('pkgs.asdf', 'defined') | selectattr('pkgs.asdf._wanted', 'defined') %}
-{%-   for plugin, versions in user.pkgs.asdf._wanted.items() %}
+{%-   for plugin, settings in user.pkgs.asdf._wanted.items() %}
 {%-     if pkgs.get('update_auto') %}
 
 asdf plugin {{ plugin }} is updated to latest version for user {{ user.name }}:
@@ -44,7 +44,7 @@ asdf plugin {{ plugin }} is updated to latest version for user {{ user.name }}:
     - user: {{ user.name }}
 
 {%-     endif %}
-{%-     for version in versions %}
+{%-     for version in settings.versions %}
 {#-       versions are either defined or latest is automatically installed, so no mode for asdf necessary #}
 
 Wanted package {{ plugin }} {{ version }} is installed with asdf for user '{{ user.name }}':

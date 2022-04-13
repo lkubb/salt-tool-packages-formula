@@ -68,15 +68,41 @@ shell: {{ user_info.shell.split('/')[-1] }}
       {%- for versioned in users[user].pkgs[mgr].get('wanted', []) -%}
         {#- 2(3) possibilities: - python / - python: 'latest' (/ - python: ['3.10', '3.8']) -#}
         {%- if versioned is string -%}
-          {%- do parsed.update({versioned: ['latest']}) -%}
+          {%- do parsed.update({
+            versioned: {
+              'versions': ['latest']
+          }}) -%}
         {%- elif versioned is mapping -%}
-          {%- set k = versioned.keys() | first -%}
-          {%- set v = versioned.values() | first -%}
+          {%- set k = versioned | first -%}
+          {%- set v = versioned[k] -%}
           {%- if v is string -%}
-            {%- do parsed.update({k: [v]}) -%}
+            {%- if mgr != 'crates' or k != 'git' -%}
+              {%- do parsed.update({
+                k: {
+                  'versions': [v]
+              }}) -%}
+            {%- elif mgr == 'crates' and k == 'git' %}
+              {%- do parsed.update({
+                v: {
+                  'git': True,
+                  'versions': ['latest']
+              }}) -%}
+            {%- endif %}
           {%- elif mgr in versioned_managers_multi and v | is_list -%}
             {#- if package manager supports installing multiple versions of the same package, allow lists -#}
-            {%- do parsed.update({k: v}) -%}
+            {%- do parsed.update({
+              k: {
+                'versions': v
+            }}) -%}
+          {%- elif 'crates' == mgr and k == 'git' %}
+            {%- do parsed.update({
+              v.source: {
+                'branch': v.get('branch'),
+                'git': True,
+                'rev': v.get('rev'),
+                'tag': v.get('tag'),
+                'versions': ['latest']
+            }}) -%}
           {%- else -%}
             {%- do salt['log.error']("Something is wrong in your definitions for " ~ mgr ~ ". Please check your pillar.") -%}
           {%- endif -%}

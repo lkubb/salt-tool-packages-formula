@@ -35,12 +35,16 @@ Required packages for crates installation are installed:
 
 {%- for user in pkgs.users | selectattr('pkgs.crates', 'defined') | selectattr('pkgs.crates._wanted', 'defined') %}
 
-{%-   for crate, version in user.pkgs.crates._wanted.items() %}
+{%-   for crate, settings in user.pkgs.crates._wanted.items() %}
 
 Wanted crate '{{ crate }}' is installed for user '{{ user.name }}':
-  cargo.{{ mode }}:
+  cargo.{{ mode if not settings.git else 'installed' }}:
     - name: {{ crate }}
-    - version: {{ version | first }}
+    - git: {{ settings.git | default(False) }}
+    - branch: {{ settings.branch | default(None) }}
+    - rev: {{ settings.rev | default(None) }}
+    - tag: {{ settings.tag | default(None) }}
+    - version: {{ settings.versions | first }}
     - user: {{ user.name }}
     - require:
       - Rust setup is completed
