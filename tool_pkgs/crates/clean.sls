@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 # vim: ft=sls
 
-{%- set tplroot = tpldir.split('/')[0] %}
+{%- set tplroot = tpldir.split("/")[0] %}
 {%- from tplroot ~ "/map.jinja" import mapdata as pkgs with context %}
 
 
-{%- for user in pkgs.users | selectattr('pkgs.crates', 'defined') | selectattr('pkgs.crates._wanted', 'defined') %}
+{%- for user in pkgs.users | selectattr("pkgs.crates", "defined") | selectattr("pkgs.crates._wanted", "defined") %}
 {%-   for crate, settings in user.pkgs.crates._wanted.items() %}
 {%-     if settings.git %}
 

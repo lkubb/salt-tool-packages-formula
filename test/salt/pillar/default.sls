@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 # vim: ft=yaml
+# yamllint disable rule:comments-indentation
 ---
 tool_global:
   users:
@@ -57,6 +57,7 @@ tool_pkgs:
     paths:
       confdir: '.pkgs'
       conffile: 'config'
+    rootgroup: root
   update_auto: false
 
   tofs:

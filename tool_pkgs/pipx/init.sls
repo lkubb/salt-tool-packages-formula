@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
 # vim: ft=sls
 
-{%- set tplroot = tpldir.split('/')[0] %}
+{%- set tplroot = tpldir.split("/")[0] %}
 {%- from tplroot ~ "/map.jinja" import mapdata as pkgs with context %}
 
-{%- set mode = 'latest' if pkgs.get('update_auto') else 'installed' %}
+{%- set mode = "latest" if pkgs.get("update_auto") else "installed" %}
 
-{%- set req_states = pkgs | traverse('_pipx:required:states', []) %}
-{%- set req_pkgs = pkgs | traverse('_pipx:required:pkgs', []) %}
+{%- set req_states = pkgs | traverse("_pipx:required:states", []) %}
+{%- set req_pkgs = pkgs | traverse("_pipx:required:pkgs", []) %}
 
 include:
   - tool_pipx
@@ -32,9 +31,9 @@ Required packages for pipx package installation are installed:
 {%-   endif %}
 {%- endif %}
 
-{%- for user in pkgs.users | selectattr('pkgs.pipx', 'defined') | selectattr('pkgs.pipx.wanted', 'defined') %}
-{%-   set req_states = user.pkgs.pipx | traverse('required:states', []) %}
-{%-   set req_pkgs =  user.pkgs.pipx | traverse('required:pkgs', False) %}
+{%- for user in pkgs.users | selectattr("pkgs.pipx", "defined") | selectattr("pkgs.pipx.wanted", "defined") %}
+{%-   set req_states = user.pkgs.pipx | traverse("required:states", []) %}
+{%-   set req_pkgs =  user.pkgs.pipx | traverse("required:pkgs", False) %}
 {%-   for package in user.pkgs.pipx.wanted %}
 
 Wanted pipx package '{{ package }}' is installed for user '{{ user.name }}':

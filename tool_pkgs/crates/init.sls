@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
 # vim: ft=sls
 
-{%- set tplroot = tpldir.split('/')[0] %}
+{%- set tplroot = tpldir.split("/")[0] %}
 {%- from tplroot ~ "/map.jinja" import mapdata as pkgs with context %}
 
-{%- set mode = 'latest' if pkgs.get('update_auto') else 'installed' %}
+{%- set mode = "latest" if pkgs.get("update_auto") else "installed" %}
 
-{%- set req_states = pkgs | traverse('_crates:required:states', []) %}
-{%- set req_pkgs = pkgs | traverse('_crates:required:pkgs', []) %}
+{%- set req_states = pkgs | traverse("_crates:required:states", []) %}
+{%- set req_pkgs = pkgs | traverse("_crates:required:pkgs", []) %}
 
 include:
   - tool_rust
@@ -32,12 +31,12 @@ Required packages for crates installation are installed:
 {%-   endif %}
 {%- endif %}
 
-{%- for user in pkgs.users | selectattr('pkgs.crates', 'defined') | selectattr('pkgs.crates._wanted', 'defined') %}
+{%- for user in pkgs.users | selectattr("pkgs.crates", "defined") | selectattr("pkgs.crates._wanted", "defined") %}
 
 {%-   for crate, settings in user.pkgs.crates._wanted.items() %}
 
 Wanted crate '{{ crate }}' is installed for user '{{ user.name }}':
-  cargo.{{ mode if not settings.git else 'installed' }}:
+  cargo.{{ mode if not settings.git else "installed" }}:
     - name: {{ crate }}
     - git: {{ settings.git | default(False) }}
     - branch: {{ settings.branch | default(None) }}

@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
 # vim: ft=sls
 
-{%- set tplroot = tpldir.split('/')[0] %}
+{%- set tplroot = tpldir.split("/")[0] %}
 {%- from tplroot ~ "/map.jinja" import mapdata as pkgs with context %}
 
-{%- set mode = 'latest' if pkgs.get('update_auto') else 'installed' %}
+{%- set mode = "latest" if pkgs.get("update_auto") else "installed" %}
 
-{%- set req_states = pkgs | traverse('_mas:required:states', []) %}
-{%- set req_pkgs = pkgs | traverse('_mas:required:pkgs', []) %}
+{%- set req_states = pkgs | traverse("_mas:required:states", []) %}
+{%- set req_pkgs = pkgs | traverse("_mas:required:pkgs", []) %}
 
 include:
   - tool_mas
@@ -32,9 +31,9 @@ Required packages for Mac App Store App installation are installed:
 {%-   endif %}
 {%- endif %}
 
-{%- for user in pkgs.users | selectattr('pkgs.mas', 'defined') | selectattr('pkgs.mas.wanted', 'defined') %}
-{%-   set req_states = user.pkgs.mas | traverse('required:states', []) %}
-{%-   set req_pkgs =  user.pkgs.mas | traverse('required:pkgs', False) %}
+{%- for user in pkgs.users | selectattr("pkgs.mas", "defined") | selectattr("pkgs.mas.wanted", "defined") %}
+{%-   set req_states = user.pkgs.mas | traverse("required:states", []) %}
+{%-   set req_pkgs =  user.pkgs.mas | traverse("required:pkgs", false) %}
 {%-   for app in user.pkgs.mas.wanted %}
 
 Wanted Mac App Store app '{{ app }}' is installed for user '{{ user.name }}':

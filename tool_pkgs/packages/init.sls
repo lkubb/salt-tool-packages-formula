@@ -1,12 +1,11 @@
-# -*- coding: utf-8 -*-
 # vim: ft=sls
 
-{%- set tplroot = tpldir.split('/')[0] %}
+{%- set tplroot = tpldir.split("/")[0] %}
 {%- from tplroot ~ "/map.jinja" import mapdata as pkgs with context %}
 
-{%- set mode = 'latest' if pkgs.get('update_auto')
-                        and not grains['kernel'] == 'Darwin'
-          else 'installed' %}
+{%- set mode = "latest" if pkgs.get("update_auto")
+                        and grains.kernel != "Darwin"
+          else "installed" %}
 
 {%- set req_states = pkgs._system_pkgs.req_states %}
 {%- set req_pkgs = pkgs._system_pkgs.req_pkgs %}

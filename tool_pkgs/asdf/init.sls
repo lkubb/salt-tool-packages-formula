@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
 # vim: ft=sls
 
-{%- set tplroot = tpldir.split('/')[0] %}
+{%- set tplroot = tpldir.split("/")[0] %}
 {%- from tplroot ~ "/map.jinja" import mapdata as pkgs with context %}
 
-{%- set mode = 'latest' if pkgs.get('update_auto') else 'installed' %}
+{%- set mode = "latest" if pkgs.get("update_auto") else "installed" %}
 
-{%- set req_states = pkgs | traverse('_asdf:required:states', []) %}
-{%- set req_pkgs = pkgs | traverse('_asdf:required:pkgs', []) %}
+{%- set req_states = pkgs | traverse("_asdf:required:states", []) %}
+{%- set req_pkgs = pkgs | traverse("_asdf:required:pkgs", []) %}
 
 include:
   - tool_asdf
@@ -33,9 +32,9 @@ Required packages for asdf plugin/version installation are installed:
 {%- endif %}
 
 
-{%- for user in pkgs.users | selectattr('pkgs.asdf', 'defined') | selectattr('pkgs.asdf._wanted', 'defined') %}
+{%- for user in pkgs.users | selectattr("pkgs.asdf", "defined") | selectattr("pkgs.asdf._wanted", "defined") %}
 {%-   for plugin, settings in user.pkgs.asdf._wanted.items() %}
-{%-     if pkgs.get('update_auto') %}
+{%-     if pkgs.get("update_auto") %}
 
 asdf plugin {{ plugin }} is updated to latest version for user {{ user.name }}:
   asdf.plugin_latest:
