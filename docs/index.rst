@@ -1,5 +1,5 @@
-Welcome to salt-tool-pkgs-formula's documentation!
-==================================================
+Welcome to tool-pkgs-formula's documentation!
+=============================================
 
 .. toctree::
    :maxdepth: 2
