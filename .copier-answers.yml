@@ -23,6 +23,12 @@ service_abbr: pkgs
 service_name: Packages
 settings:
   update_auto: false
+  uv:
+    wanted:
+      - poetry
+      - copier:
+          extras:
+            - copier-templates-extensions
 user_settings:
   asdf:
     wanted:
@@ -50,14 +56,24 @@ user_settings:
       - Telegram
   pipx:
     required:
-      - dotsync
+      pkgs:
+        - some-package-required-for-installation
+      states:
+        - dotsync
     wanted:
       - poetry
   pkgs:
     required:
-      - tool_git
+      states:
+        - tool_git
     wanted:
       - coreutils
       - gawk
+  uv:
+    wanted:
+      - poetry
+      - copier:
+          extras:
+            - copier-templates-extensions
 initialized: true
 flavor_recorded: app

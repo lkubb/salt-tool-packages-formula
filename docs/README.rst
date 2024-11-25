@@ -5,7 +5,15 @@ Packages Formula
 
 Installs packages with different package managers that don't need further configuration. Goes well with ``tool_dotsync`` to sync dotfiles.
 
-**Note**: Currently, with the exception of `asdf` (which is a version manager after all) and `crates`, this formula will always install the latest version of the package.
+**Note**: Currently, with the exception of `asdf` (which is a version manager after all), `crates` and `uv` (restrict by specifying `version_spec`), this formula will always install the latest version of the package.
+
+You need the following formulae available on your Salt fileserver:
+
+- https://github.com/lkubb/salt-tool-asdf-formula
+- https://github.com/lkubb/salt-tool-mas-formula
+- https://github.com/lkubb/salt-tool-pipx-formula
+- https://github.com/lkubb/salt-tool-rust-formula
+- https://github.com/lkubb/salt-tool-uv-formula
 
 .. contents:: **Table of Contents**
    :depth: 1
@@ -88,22 +96,35 @@ The following shows an example of ``tool_pkgs`` per-user configuration. If provi
         # Install python applications/libs with a cli interface globally inside
         # their dedicated venv, without depending on the default python version.
       pipx:
-          # Those -> states <- will be required before installing. Works for all managers.
         required:
-          - dotsync
+            # Those -> system packages <- will be required before installing. Works for all managers.
+          pkgs:
+            - some-package-required-for-installation
+            # Those -> states <- will be required before installing. Works for all managers.
+          states:
+            - dotsync
         wanted:
           - poetry
         # package manager packages
       pkgs:
-          # Those -> states <- will be required before installing.
         required:
-          - tool_git
+            # Those -> states <- will be required before installing.
+          states:
+            - tool_git
           # Those will be installed with the system's default package manager.
           # Since they will be installed globally, all packages for all users
           # will be accumulated.
         wanted:
           - coreutils
           - gawk
+      uv:
+        wanted:
+          - poetry
+            # You can specify parameter overrides for `uv_tool.installed`
+            # in a mapping.
+          - copier:
+              extras:
+                - copier-templates-extensions
 
 Formula-specific
 ^^^^^^^^^^^^^^^^
@@ -114,6 +135,15 @@ Formula-specific
       # keep the packages updated to their latest version on subsequent
       # runs (system packages on MacOS are kept up to date by brew anyways)
     update_auto: false
+      # Globally (system-wide) installed uv tools.
+    uv:
+      wanted:
+        - poetry
+          # You can specify parameter overrides for `uv_tool.installed`
+          # in a mapping.
+        - copier:
+            extras:
+              - copier-templates-extensions
 
       # Default formula configuration for all users.
       # Packages from defaults will be merged with user-specific ones.
@@ -162,6 +192,11 @@ Performs all operations described in this formula according to the specified con
 
 
 
+``tool_pkgs.uv``
+~~~~~~~~~~~~~~~~
+
+
+
 ``tool_pkgs.clean``
 ~~~~~~~~~~~~~~~~~~~
 *Meta-state*.
@@ -192,6 +227,11 @@ in reverse order.
 
 ``tool_pkgs.pipx.clean``
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+``tool_pkgs.uv.clean``
+~~~~~~~~~~~~~~~~~~~~~~
 
 
 

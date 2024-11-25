@@ -39,6 +39,11 @@ Performs all operations described in this formula according to the specified con
 
 
 
+``tool_pkgs.uv``
+~~~~~~~~~~~~~~~~
+
+
+
 ``tool_pkgs.clean``
 ~~~~~~~~~~~~~~~~~~~
 *Meta-state*.
@@ -69,6 +74,11 @@ in reverse order.
 
 ``tool_pkgs.pipx.clean``
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+``tool_pkgs.uv.clean``
+~~~~~~~~~~~~~~~~~~~~~~
 
 
 

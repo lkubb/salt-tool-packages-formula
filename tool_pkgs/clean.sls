@@ -8,6 +8,7 @@
 #}
 
 include:
+  - .uv.clean
   - .pipx.clean
   - .mas.clean
   - .crates.clean

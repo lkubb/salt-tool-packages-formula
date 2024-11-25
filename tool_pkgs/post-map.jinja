@@ -20,7 +20,7 @@
 {#- update all users' configurations for this formula with the formula defaults -#}
 {%- do salt["defaults.update"](users, {"pkgs": mapdata.get("defaults", {})}) -%}
 
-{%- set managers = ["asdf", "crates", "mas", "pipx"] -%}
+{%- set managers = ["asdf", "crates", "mas", "pipx", "uv"] -%}
 {%- set versioned_managers = ["asdf", "crates"] -%}
 {%- set versioned_managers_multi = ["asdf"] -%}
 {%- set asdf_plugins = [] -%}

@@ -12,3 +12,4 @@ include:
   - .crates
   - .mas
   - .pipx
+  - .uv

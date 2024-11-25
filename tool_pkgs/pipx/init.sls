@@ -33,7 +33,7 @@ Required packages for pipx package installation are installed:
 
 {%- for user in pkgs.users | selectattr("pkgs.pipx", "defined") | selectattr("pkgs.pipx.wanted", "defined") %}
 {%-   set req_states = user.pkgs.pipx | traverse("required:states", []) %}
-{%-   set req_pkgs =  user.pkgs.pipx | traverse("required:pkgs", False) %}
+{%-   set req_pkgs =  user.pkgs.pipx | traverse("required:pkgs", false) %}
 {%-   for package in user.pkgs.pipx.wanted %}
 
 Wanted pipx package '{{ package }}' is installed for user '{{ user.name }}':
