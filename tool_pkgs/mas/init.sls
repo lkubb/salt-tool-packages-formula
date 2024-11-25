@@ -8,12 +8,15 @@
 {%- set req_states = pkgs | traverse("_mas:required:states", []) %}
 {%- set req_pkgs = pkgs | traverse("_mas:required:pkgs", []) %}
 
+{%- if pkgs.users | selectattr("pkgs.mas", "defined") | selectattr("pkgs.mas.wanted", "defined") | list %}
+
 include:
   - tool_mas
-{%- if req_states %}
-{%-   for state in req_states %}
+{%-   if req_states %}
+{%-     for state in req_states %}
   - {{ state }}
-{%-   endfor %}
+{%-     endfor %}
+{%-   endif %}
 {%- endif %}
 
 

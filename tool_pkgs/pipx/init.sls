@@ -8,14 +8,16 @@
 {%- set req_states = pkgs | traverse("_pipx:required:states", []) %}
 {%- set req_pkgs = pkgs | traverse("_pipx:required:pkgs", []) %}
 
+{%- if pkgs.users | selectattr("pkgs.pipx", "defined") | selectattr("pkgs.pipx.wanted", "defined") | list %}
+
 include:
   - tool_pipx
-{%- if req_states %}
-{%-   for state in req_states %}
+{%-   if req_states %}
+{%-     for state in req_states %}
   - {{ state }}
-{%-   endfor %}
+{%-     endfor %}
+{%-   endif %}
 {%- endif %}
-
 
 {%- if req_pkgs %}
 

@@ -8,12 +8,15 @@
 {%- set req_states = pkgs | traverse("_crates:required:states", []) %}
 {%- set req_pkgs = pkgs | traverse("_crates:required:pkgs", []) %}
 
+{%- if pkgs.users | selectattr("pkgs.crates", "defined") | selectattr("pkgs.crates._wanted", "defined") | list %}
+
 include:
   - tool_rust
-{%- if req_states %}
-{%-   for state in req_states %}
+{%-   if req_states %}
+{%-     for state in req_states %}
   - {{ state }}
-{%-   endfor %}
+{%-     endfor %}
+{%-   endif %}
 {%- endif %}
 
 

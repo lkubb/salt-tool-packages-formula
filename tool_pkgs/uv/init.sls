@@ -8,12 +8,15 @@
 {%- set req_states = pkgs | traverse("_uv:required:states", []) %}
 {%- set req_pkgs = pkgs | traverse("_uv:required:pkgs", []) %}
 
+{%- if (pkgs | traverse("uv:wanted", [])) or (pkgs.users | selectattr("pkgs.uv", "defined") | selectattr("pkgs.uv.wanted", "defined") | list) %}
+
 include:
   - tool_uv
-{%- if req_states %}
-{%-   for state in req_states %}
+{%-   if req_states %}
+{%-     for state in req_states %}
   - {{ state }}
-{%-   endfor %}
+{%-     endfor %}
+{%-   endif %}
 {%- endif %}
 
 
