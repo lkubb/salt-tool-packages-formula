@@ -41,10 +41,10 @@ Required packages for crates installation are installed:
 Wanted crate '{{ crate }}' is installed for user '{{ user.name }}':
   cargo.{{ mode if not settings.git else "installed" }}:
     - name: {{ crate }}
-    - git: {{ settings.git | default(False) }}
-    - branch: {{ settings.branch | default(None) }}
-    - rev: {{ settings.rev | default(None) }}
-    - tag: {{ settings.tag | default(None) }}
+    - git: {{ settings.git | default(False) | json }}
+    - branch: {{ settings.branch | default(none) | json }}
+    - rev: {{ settings.rev | default(none) | json }}
+    - tag: {{ settings.tag | default(none) | json }}
     - version: {{ settings.versions | first }}
     - user: {{ user.name }}
     - require:
